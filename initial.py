@@ -1,38 +1,20 @@
 # python 3.8
 # Made by sum cunt
-import psycopg2
-from updateSDE import config
+from dbConnection import dbConnectionClose, dbConnectionOpen
+from dataIngress import SDEupdate
 
 
-def dbConnectionOpen():
-    """ Connect to the PostgreSQL database server """
-    conn = None
-    params = config()
-        
-        # connect to the PostgreSQL server
-    print('Connecting to the PostgreSQL database...')
-    conn = psycopg2.connect(**params)
+databasename = "eveIndy"
+dbappuser = "eveAPIapp"
+newestSDE = "tmp/postgres-latest.dmp"
 
-    return conn
-
-def dbConnectionClose(conn):
-    conn.close()
-    print('Database connection closed.')
-
-def dbprint(conn):
-    # create a cursor
-    cur = conn.cursor()
-        
-	# execute a statement
-    print('PostgreSQL database version:')
-    cur.execute('SELECT version()')
-    # display the PostgreSQL database server version
-    db_version = cur.fetchone()
-    print(db_version)
+updateSDEBool = False
 
 # __name__
 if __name__=="__main__":
     conn = dbConnectionOpen()
 
-    # dbprint(conn)
+    if updateSDEBool == True:
+        SDEupdate(newestSDE)
+
     dbConnectionClose(conn)
