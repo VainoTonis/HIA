@@ -5,11 +5,11 @@ from decouple import config
 
 def setDatabaseConnectionVariables():
     try:
-        environ['PGHOST'] = config('host')
-        environ['PGPORT'] = config('port')
-        environ['PGDATABASE'] = config('database')
-        environ['PGUSER'] = config('user')
-        environ['PGPASSWORD'] = config('password')
+        environ['PGHOST'] = config('DB_HOST')
+        environ['PGPORT'] = config('DB_PORT')
+        environ['PGDATABASE'] = config('DB_NAME')
+        environ['PGUSER'] = config('DB_USER')
+        environ['PGPASSWORD'] = config('DB_PASSWORD')
 
 
     except (Exception) as error:
@@ -17,16 +17,19 @@ def setDatabaseConnectionVariables():
         exit()
 
 def dbConnectionOpen():
-    print(environ.get("PGHOST"))
-    """ Connect to the PostgreSQL database server """
+    # connection info
     setDatabaseConnectionVariables()
+    
+    # connect to the PostgreSQL server 
     conn = None
-    # params = configOriginal(connectionFile)
-        
-        # connect to the PostgreSQL server
-    print('Connecting to the PostgreSQL database...')
-    conn = connect('')
+    try:
+        print('Connecting to the PostgreSQL database...')
+        conn = connect('')
 
+    except (Exception) as error:
+        print("Connection error: " + error)
+        exit()
+    
     return conn
 
 def dbConnectionClose(conn):

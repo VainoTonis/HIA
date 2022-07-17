@@ -7,5 +7,15 @@ def SDEupdate(newestSDE):
         run(["pg_restore", "--dbname=" +  environ.get("PGDATABASE"), newestSDE])
        
     except (Exception) as error:
-        print(error)
+        print("SDE Update error: " + error)
         exit()
+
+def databaseQuery(conn):
+    curr = conn.cursor()
+    curr.execute('select * from "invGroups" ig where "groupName" like ' + "'%Blueprint';")
+    data = curr.fetchall()
+
+    for result in data:
+        print(result)
+
+    # print(data)
