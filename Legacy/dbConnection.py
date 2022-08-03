@@ -20,7 +20,7 @@ def dbConnectionOpen():
     # connection info
     setDatabaseConnectionVariables()
     
-    # connect to the PostgreSQL server 
+    # connect to the PostgreSQL server
     conn = None
     try:
         print('Connecting to the PostgreSQL database...')

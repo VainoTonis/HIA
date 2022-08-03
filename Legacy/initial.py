@@ -1,6 +1,6 @@
 # python 3.10.4
 # Made by sum cunt
-from dbConnection import dbConnectionClose, dbConnectionOpen
+from Legacy import dbConnectionClose, dbConnectionOpen
 from dataIngress import SDEupdate, databaseQuery
 
 
