@@ -1,4 +1,10 @@
+# Folders
+
 __pycache__/
 tmp/
 .vscode/
+migrations/
+
+# environmental variables
+
 *.env
