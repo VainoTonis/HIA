@@ -1,12 +1,12 @@
 # python 3.10.4
 # Made by sum cunt
-from Legacy import dbConnectionClose, dbConnectionOpen
+from dbConnection import dbConnectionClose, dbConnectionOpen
 from dataIngress import SDEupdate, databaseQuery
 
 
 databasename = "eveIndy"
 dbappuser = "eveAPIapp"
-newestSDE = "tmp/postgres-latest.dmp"
+newestSDE = "tmp/postgres-schema-latest.dmp"
 
 updateSDEBool = False
 

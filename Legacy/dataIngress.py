@@ -12,7 +12,7 @@ def SDEupdate(newestSDE):
 
 def databaseQuery(conn):
     curr = conn.cursor()
-    curr.execute('select * from "invGroups" ig where "groupName" like ' + "'%Blueprint';")
+    curr.execute('select * from evesde."invGroups" ig where "groupName" like ' + "'%Blueprint';")
     data = curr.fetchall()
 
     for result in data:
