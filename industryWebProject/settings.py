@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'blueprintViewer.apps.BlueprintviewerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +83,7 @@ DATABASES = {
     'default': {
         'ENGINE': env('APP_DB_ENGINE'),
         'OPTIONS': {
-            'options': '-c search_path=applicationDataSchema'
+            'options': '-c search_path=applicationDataTree,public'
         },
         'NAME': env('DB_NAME'),    
         'USER': env('DB_USER'),
@@ -90,10 +91,11 @@ DATABASES = {
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT')
     },
-    'SDE': {
+    
+    'sde': {
         'ENGINE': env('APP_DB_ENGINE'),
         'OPTIONS': {
-            'options': '-c search_path=public'
+            'options': '-c search_path=evesde'
         },
         'NAME': env('DB_NAME'),    
         'USER': env('DB_USER'),
@@ -127,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'EET'
 
 USE_I18N = True
 
