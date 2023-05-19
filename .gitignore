@@ -1,9 +1,9 @@
 # Folders
-
 __pycache__/
 tmp/
 .vscode/
 migrations/
+old/
 
 # Configuration files
 config.yaml
