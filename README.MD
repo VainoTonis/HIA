@@ -1,5 +1,10 @@
-# SIA
-or Space Industry Assistant is an EVE online tool to help me manage my industry. It may or may not work for you as i am one of the few people actually running on linux, so windows, mac and even other linux flavours are unknown.
+# EIA
+or EVE Industry Assistant is an EVE online tool to help me manage my industry. It may or may not work for you as i am one of the few people actually running on linux, so windows, mac and even other linux flavours are unknown.
+
+
+# Current plans
+
+Basicly get everything related to PI, first off the info from EVE API, then move to more advanced stuff with the SDE.
 
 
 
