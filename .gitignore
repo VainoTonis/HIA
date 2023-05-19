@@ -5,6 +5,6 @@ tmp/
 .vscode/
 migrations/
 
-# environmental variables
-
+# Configuration files
+config.yaml
 *.env
