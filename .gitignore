@@ -5,6 +5,10 @@ tmp/
 migrations/
 old/
 
+# SQLite DB file
+*.sqlite3
+
+
 # Configuration files
 config.yaml
 *.env
