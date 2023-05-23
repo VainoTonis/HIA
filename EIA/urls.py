@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from introOfIntroness.views import landingPage
 
 urlpatterns = [
+    path('', landingPage, name='landing-page'),
     path('admin/', admin.site.urls),
 ]
