@@ -1,0 +1,30 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EIA - Eve Industry Assistant></title>
+    <description></description>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+</head>
+<body>
+    <div id="sidebar">
+        <!-- Sidebar content goes here -->
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </div>
+    <div id="content">
+        <!-- Content block to be overridden by child templates -->
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="footer">
+        <!-- Footer content goes here -->
+        &copy; 2023 My Website. All rights reserved.
+    </div>
+</body>
+</html>
