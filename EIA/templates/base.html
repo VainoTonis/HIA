@@ -7,12 +7,15 @@
 
     {% load static %}
     <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
             <ul>
-                <li><a href="/">Home</a></li>
+                <a href="/">
+                    <img src="{% static 'eia.png' %}" alt="logo">
+                </a>
                 <li><a href="/about">About</a></li>
                 <li><a href="/contact">Contact</a></li>
             </ul>
