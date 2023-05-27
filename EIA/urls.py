@@ -16,9 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from introOfIntroness.views import landingPage
+from about.views import landingPage
+from errorinator.views import errorRedirect
+from pi.views import piPage
 
 urlpatterns = [
     path('', landingPage, name='landing-page'),
+    path('pi/', piPage, name='pi-page'),
     path('admin/', admin.site.urls),
 ]
+
+
+# # Error handling
+handler404 = errorRedirect

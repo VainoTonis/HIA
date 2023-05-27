@@ -1,0 +1,33 @@
+2023-05-25 22:49:41 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 22:49:42 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 22:53:38 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 22:53:39 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 22:55:29 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 22:55:30 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:03:56 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:04:20 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:04:29 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:06:02 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:06:03 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:06:30 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:06:30 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:06:30 [INFO] django.server: "GET /static/base.css HTTP/1.1" 200 688
+2023-05-25 23:06:30 [INFO] django.server: "GET /static/eia.png HTTP/1.1" 200 4427
+2023-05-25 23:06:30 [WARNING] django.request: Not Found: /favicon.ico
+2023-05-25 23:06:30 [WARNING] django.server: "GET /favicon.ico HTTP/1.1" 404 2228
+2023-05-25 23:06:44 [INFO] django.utils.autoreload: /home/tonis/Documents/EIA/EIA/settings.py changed, reloading.
+2023-05-25 23:06:45 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:06:50 [INFO] django.server: "GET /pi HTTP/1.1" 200 853
+2023-05-25 23:06:50 [INFO] django.server: "GET /favicon.ico HTTP/1.1" 200 853
+2023-05-25 23:06:50 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:06:50 [INFO] django.server: "GET /favicon.ico HTTP/1.1" 200 853
+2023-05-25 23:06:52 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:06:52 [INFO] django.server: "GET /favicon.ico HTTP/1.1" 200 853
+2023-05-25 23:06:59 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:06:59 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:06:59 [INFO] django.server: "GET /favicon.ico HTTP/1.1" 200 853
+2023-05-25 23:08:35 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:08:36 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:12:05 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2023-05-25 23:12:06 [INFO] django.server: "GET / HTTP/1.1" 200 878
+2023-05-25 23:12:06 [INFO] django.server: "GET /favicon.ico HTTP/1.1" 200 853

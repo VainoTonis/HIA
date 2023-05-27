@@ -20,7 +20,7 @@ body {
 /* Sidebar styles */
 
 .sidebar {
-  width: 10%;
+  /* width: 10%; */
   background-color: #f1f1f1;
   padding: 20px;
 }
