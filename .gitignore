@@ -4,6 +4,7 @@ tmp/
 .vscode/
 migrations/
 old/
+logs/*
 
 # SQLite DB file
 *.sqlite3
