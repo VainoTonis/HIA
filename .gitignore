@@ -3,8 +3,8 @@ __pycache__/
 tmp/
 .vscode/
 migrations/
-old/
 logs/*
+generatedStatic/
 
 # SQLite DB file
 *.sqlite3
