@@ -3,8 +3,8 @@ import logging
 from os import environ
 from time import sleep
 from threading import Thread
-from subprocess import run
-from PyQt5.QtCore import QUrl, pyqtSignal
+from subprocess import Popen
+from PyQt5.QtCore import QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
@@ -36,12 +36,12 @@ def startWebView(webBrowser):
     sys.exit(webBrowser.exec())
 
 def startDjangoServer():
-    run(['python', 'manage.py', 'runserver', '8000'])
+    djangoProcess = Popen(['python', 'manage.py', 'runserver', '8000'])
 
 if __name__ == '__main__':
     # Start the Django development server in a separate thread
-    django_thread = Thread(target=startDjangoServer)
-    django_thread.start()
+    djangoThread = Thread(target=startDjangoServer)
+    djangoThread.start()
 
     # Create a QApplication instance
     webBrowser = QApplication(sys.argv)
