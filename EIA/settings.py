@@ -50,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-#    'externalConnections.externalConnections.ESIAuth',
 ]
 
 ROOT_URLCONF = 'EIA.urls'
