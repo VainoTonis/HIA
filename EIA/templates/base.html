@@ -9,23 +9,24 @@
     <link rel="stylesheet" href="{% static 'base.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
 </head>
+<header class="navbar">
+    <div class="mainNavigation">
+        <a href="/"><img src="{% static 'eia.png' %}" alt="logo" height="75" width="75"></a>
+        <a href="/pi">Planetary Interraction</a>
+    </div>
+    <div class="alignRight">
+        <a href="/login">Authorize</a>
+    </div>
+</header>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <ul>
-                <a href="/">
-                    <img src="{% static 'eia.png' %}" alt="logo">
-                </a>
-                <li><a href="/pi">Planetary Interraction</a></li>
-            </ul>
-        </div>
         <div class="content">
             {% block content %}
             {% endblock %}
         </div>
     </div>
-    <footer class="footer">
-        &copy; 2023 My Website. All rights reserved.
-    </footer>
 </body>
+<footer class="footer">
+    &copy; 2023 My Website. All rights reserved.
+</footer>
 </html>
