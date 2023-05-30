@@ -8,18 +8,6 @@ Basicly get everything related to PI, first off the info from EVE API, then move
 
 # Running from source
 
-1. Install Poetry
-2. Activate poetry (poetry install command)
-3. Activate virtual environment (poetry shell)
-3. generate static files (python manage.py collectstatic)
-4. Choose one way to run the server
-    a. python manage.py runserver
-        - This will simply run the django web server without the embedded web view
-    b. python threadedEmbededWebView.py
-        - This one runs django and embedded web browser in seperate threads
-
-# PSA!
-This is not something to be launched as a seperate website, i am simply using a browser as a frontend because it looks nicer faster (i am sorry pyfa). Also I am sort of familiar with doing websites so this seemed like a great project to refresh and lean new things both python and web dev related.
 
 I  am not sure where this project is heading (Project completion and garbage bin are both very viable options), so one day this might be just depricated and slowly (or quickly) will decay away.
 

@@ -6,9 +6,8 @@ migrations/
 logs/*
 generatedStatic/
 
-# SQLite DB file
-*.sqlite3
-
+# SQLite DB files
+sqlite/*
 
 # Configuration files
 config.yaml
