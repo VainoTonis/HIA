@@ -1,69 +1,73 @@
-import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QStackedWidget, QDockWidget, QStyle
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
+from sqlitestuff import getP0Data
+from uiElements import planetTextItem,rawResourceTextItem,createConnection
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+def createPlanetTextItems(scene, planetNames):
+    planetTextItems = []
+    for i, planetName in enumerate(planetNames):
+        planetText = planetTextItem(planetName)
+        planetText.setPos(25, 150 + i * 20)
+        scene.addItem(planetText)
+        planetTextItems.append(planetText)
+    return planetTextItems
 
-        # Create the side navigation bar
-        nav_widget = QWidget()
-        nav_layout = QVBoxLayout(nav_widget)
-        nav_layout.setContentsMargins(0, 0, 0, 0)
+def createResourceTextItemsAndConnections(scene, relationships, planetTextItems):
+    resourceTextItems = []
+    for relationship in relationships:
+        planet_name = relationship['planet']
+        resource_name = relationship['p0']
 
-        # Create the navigation buttons
-        button_page1 = QPushButton("Page 1")
-        button_page2 = QPushButton("Page 2")
+        # Find the corresponding PlanetTextItem in planet_text_items
+        planetText = next(
+            (item for item in planetTextItems if item.toPlainText() == planet_name),
+            None,
+        )
 
-        # Connect the buttons to their respective page in the stacked widget
-        button_page1.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
-        button_page2.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
+        # If the corresponding PlanetTextItem is not found, continue to the next relationship
+        if planetText is None:
+            continue
 
-        # Add the buttons to the navigation layout
-        nav_layout.addWidget(button_page1)
-        nav_layout.addWidget(button_page2)
+        # Find the corresponding ResourceTextItem in resource_text_items or create a new one
+        resourceText = next(
+            (item for item in resourceTextItems if item.toPlainText() == resource_name),
+            None,
+        )
+        if resourceText is None:
+            # Create a new ResourceTextItem for the resource_name
+            resourceText = rawResourceTextItem(resource_name)
 
-        # Create the stacked widget for pages
-        self.stacked_widget = QStackedWidget()
+            # Set the position and add the ResourceTextItem to the scene
+            resourceText.setPos(200, 150 + len(resourceTextItems) * 20)
+            scene.addItem(resourceText)
+            resourceTextItems.append(resourceText)
 
-        # Create page widgets
-        page1 = QWidget()
-        page1.setStyleSheet("background-color: #E6E6FA")  # Example background color
-        page2 = QWidget()
-        page2.setStyleSheet("background-color: #FFDAB9")  # Example background color
+        connection = createConnection(planetText, resourceText)
+        scene.addItem(connection)
 
-        # Add pages to the stacked widget
-        self.stacked_widget.addWidget(page1)
-        self.stacked_widget.addWidget(page2)
+def main():
+        
+    app = QApplication([])
 
-        # Set the initial page to display
-        self.stacked_widget.setCurrentIndex(0)
+    # Create a QGraphicsScene and set the scene rect
+    scene = QGraphicsScene(0, 0, 800, 600)
 
-        # Set the central widget of the main window to the stacked widget
-        self.setCentralWidget(self.stacked_widget)
+    relationships = getP0Data()
 
-        # Set the side navigation bar as the left widget of the main window
-        self.setCentralWidget(self.stacked_widget)
+    # Extract unique planet names and resource names
+    planetTypes = list(set([relationship['planet'] for relationship in relationships]))
+    rawResources = list(set([relationship['p0'] for relationship in relationships]))
 
-        # Create a dock widget for the navigation bar
-        dock_widget = QDockWidget()
-        dock_widget.setWidget(nav_widget)
-
-        # Set the dock widget properties
-        dock_widget.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
-        dock_widget.setTitleBarWidget(QWidget())  # Remove the title bar
-
-        # Add the dock widget to the left side of the main window
-        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dock_widget)
+    planetTextItems = createPlanetTextItems(scene, planetTypes)
+    createResourceTextItemsAndConnections(scene, relationships, planetTextItems)
 
 
+    # Create a QGraphicsView and set the scene
+    view = QGraphicsView(scene)
+    view.show()
+
+    app.exec()
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    window = MainWindow()
-    window.show()
-
-    sys.exit(app.exec())
+    main()
