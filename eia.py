@@ -12,38 +12,43 @@ def createPlanetTextItems(scene, planetNames):
         planetTextItems.append(planetText)
     return planetTextItems
 
-def createResourceTextItemsAndConnections(scene, relationships, planetTextItems):
-    resourceTextItems = []
-    for relationship in relationships:
-        planet_name = relationship['planet']
-        resource_name = relationship['p0']
+def createResourceTextItem(scene, resourceName, resourceTextItems):
+    resourceText = next(
+        (item for item in resourceTextItems if item.toPlainText() == resourceName),
+        None,
+    )
+    if resourceText is None:
+        resourceText = rawResourceTextItem(resourceName)
+        resourceText.setPos(200, 150 + len(resourceTextItems) * 20)
+        scene.addItem(resourceText)
+        resourceTextItems.append(resourceText)
+    return resourceText
 
-        # Find the corresponding PlanetTextItem in planet_text_items
-        planetText = next(
-            (item for item in planetTextItems if item.toPlainText() == planet_name),
+def createResourceConnection(scene, planetText, resourceText):
+    connection = createConnection(planetText, resourceText)
+    scene.addItem(connection)
+    return connection
+
+def createTextItemsAndConnections(scene, relationships, sourceItems, sourceAttribute, targetAttribute):
+    targetTextItems = []
+    for relationship in relationships:
+        sourceName = relationship[sourceAttribute]
+        targetName = relationship[targetAttribute]
+
+        sourceText = next(
+            (item for item in sourceItems if item.toPlainText() == sourceName),
             None,
         )
 
-        # If the corresponding PlanetTextItem is not found, continue to the next relationship
-        if planetText is None:
+        if sourceText is None:
             continue
 
-        # Find the corresponding ResourceTextItem in resource_text_items or create a new one
-        resourceText = next(
-            (item for item in resourceTextItems if item.toPlainText() == resource_name),
-            None,
-        )
-        if resourceText is None:
-            # Create a new ResourceTextItem for the resource_name
-            resourceText = rawResourceTextItem(resource_name)
+        targetText = createResourceTextItem(scene, targetName, targetTextItems)
+        createResourceConnection(scene, sourceText, targetText)
 
-            # Set the position and add the ResourceTextItem to the scene
-            resourceText.setPos(200, 150 + len(resourceTextItems) * 20)
-            scene.addItem(resourceText)
-            resourceTextItems.append(resourceText)
+    return targetTextItems
 
-        connection = createConnection(planetText, resourceText)
-        scene.addItem(connection)
+
 
 def main():
         
@@ -59,7 +64,8 @@ def main():
     rawResources = list(set([relationship['p0'] for relationship in relationships]))
 
     planetTextItems = createPlanetTextItems(scene, planetTypes)
-    createResourceTextItemsAndConnections(scene, relationships, planetTextItems)
+    createTextItemsAndConnections(scene, relationships, planetTextItems, 'planet', 'p0')
+
 
 
     # Create a QGraphicsView and set the scene
