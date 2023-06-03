@@ -12,3 +12,4 @@ sqlite/*
 # Configuration files
 config.yaml
 *.env
+poetry.lock
