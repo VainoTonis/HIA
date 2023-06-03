@@ -11,43 +11,53 @@ def closeDBConnection(conn):
 def getP0Data():
     conn, cursor = connectToSDE()
 
-    planetQuery = "SELECT typeName FROM invTypes WHERE groupID IN (1026)"
-
-    cursor.execute(planetQuery)
-
+    planetRawResourcesQuery = "SELECT typeName FROM invTypes WHERE groupID IN (1026)"
+    cursor.execute(planetRawResourcesQuery)
     results = cursor.fetchall()
 
-    planetP0List = []
+    planetP1List = []
+
+    nameMapping = {
+        'Aqueous Liquid': 'Aqueous Liquids',
+    }
 
     for row in results:
+        planetType = row[0].split()[0]
+        p0 = ' '.join(row[0].split()[1:-1])
+        # Check if the P0 name exists in the mapping dictionary
+        if p0 in nameMapping:
+            p0 = nameMapping[p0]
+
         rawResources = {
-                'planet' : row[0].split()[0],
-                'p0': ' '.join(row[0].split()[1:-1])
-            }
-        planetP0List.append(rawResources)
+            'planet': planetType,
+            'p0': p0
+        }
+
+        planetP1List.append(rawResources)
 
     # Close the connection
     closeDBConnection(conn)
-
-    return planetP0List
+    return planetP1List
 
 
 def getPIData(rawResources):
     conn, cursor = connectToSDE()
-    query = ""
-    results = cursor.fetchall()
+    query = "SELECT typeID, typeName FROM invTypes WHERE typeName LIKE (?)"
 
-    for row in results:
-        print(row)
+    for resource in rawResources:
+        cursor.execute(query,(resource,))
+        results = cursor.fetchall()
+        print(results)
+
 
     # Close the connection
     conn.close()
 
 
-testData = ['Felsic Magma', 'Complex Organisms', 'Carbon Compounds', 'Noble Metals', 'Base Metals', 'Autotrophs', 'Reactive Gas', 'Planktic Colonies', 'Non-CS Crystals', 'Aqueous Liquid', 'Microorganisms', 'Suspended Plasma', 'Heavy Metals', 'Noble Gas', 'Ionic Solutions']
+testData = ['Planktic Colonies', 'Aqueous Liquids', 'Suspended Plasma', 'Ionic Solutions', 'Non-CS Crystals', 'Complex Organisms', 'Carbon Compounds', 'Felsic Magma', 'Autotrophs', 'Microorganisms', 'Base Metals', 'Noble Gas', 'Noble Metals', 'Reactive Gas', 'Heavy Metals']
 
-getPIData(testData)
-# Gray = Planet
+# getPIData(testData)
+# White = Planet
 # Yellow = Resource
 # Green = Tier 1 Product (P1)
 # Aqua = Tier 2 Product (P2)
