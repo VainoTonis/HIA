@@ -77,6 +77,13 @@ def createConnection(planetText, resourceText):
     gradient.setColorAt(0.0, QColor('white'))  # Color at the planet end
     gradient.setColorAt(1.0, QColor('yellow'))  # Color at the resource end
 
+# White = Planet
+# Yellow = Resource
+# Green = Tier 1 Product (P1)
+# Aqua = Tier 2 Product (P2)
+# Blue = Tier 3 Product (P3)
+# Pink = Tier 4 Product (P4)
+
     pen = QPen(QBrush(gradient), 1)  # Create a pen with the gradient brush
     connection.setPen(pen)
 
@@ -88,3 +95,6 @@ def createConnection(planetText, resourceText):
     resourceText.connections.append(connection)
 
     return connection
+
+
+

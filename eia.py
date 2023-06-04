@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
-from sqlitestuff import getP0Data
+from sqlitestuff import getPIData
 from uiElements import planetTextItem,rawResourceTextItem,createConnection
 
 
@@ -29,25 +29,25 @@ def createResourceConnection(scene, planetText, resourceText):
     scene.addItem(connection)
     return connection
 
-def createTextItemsAndConnections(scene, relationships, sourceItems, sourceAttribute, targetAttribute):
+def createTextItemsAndConnections(scene, piData, sourceAttribute, targetAttribute):
     targetTextItems = []
-    for relationship in relationships:
-        sourceName = relationship[sourceAttribute]
-        targetName = relationship[targetAttribute]
+    processed_planets = set()  # Set to store processed planets
+    # Iterate over the P0 data
+    for p0, p0Data in piData[targetAttribute].items():
+        planetTypes = p0Data[sourceAttribute]
+        
+        # Create planetTextItem for each planet type
+        for planetType in planetTypes:
+            if planetType in processed_planets:
+                continue
 
-        sourceText = next(
-            (item for item in sourceItems if item.toPlainText() == sourceName),
-            None,
-        )
-
-        if sourceText is None:
-            continue
-
-        targetText = createResourceTextItem(scene, targetName, targetTextItems)
-        createResourceConnection(scene, sourceText, targetText)
-
+            planetText = planetTextItem(planetType)
+            planetText.setPos(25, 150 + len(targetTextItems) * 20)
+            scene.addItem(planetText)
+            targetTextItems.append(planetText)
+            processed_planets.add(planetType)  # Add processed planet to set
+                
     return targetTextItems
-
 
 
 def main():
@@ -56,16 +56,10 @@ def main():
 
     # Create a QGraphicsScene and set the scene rect
     scene = QGraphicsScene(0, 0, 800, 600)
-
-    relationships = getP0Data()
     # Extract unique planet names and resource names
-    planetTypes = list(set([relationship['planet'] for relationship in relationships]))
-    rawResources = list(set([relationship['p0'] for relationship in relationships]))
+    piData = getPIData()
 
-    planetTextItems = createPlanetTextItems(scene, planetTypes)
-    createTextItemsAndConnections(scene, relationships, planetTextItems, 'planet', 'p0')
-
-
+    createTextItemsAndConnections(scene, piData, 'planetTypes', 'P0')
 
     # Create a QGraphicsView and set the scene
     view = QGraphicsView(scene)

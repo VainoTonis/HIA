@@ -8,37 +8,6 @@ def connectToSDE():
 def closeDBConnection(conn):
     conn.close()
 
-def getP0Data():
-    conn, cursor = connectToSDE()
-
-    planetRawResourcesQuery = "SELECT typeName FROM invTypes WHERE groupID IN (1026)"
-    cursor.execute(planetRawResourcesQuery)
-    results = cursor.fetchall()
-
-    planetP1List = []
-
-    nameMapping = {
-        'Aqueous Liquid': 'Aqueous Liquids',
-    }
-
-    for row in results:
-        planetType = row[0].split()[0]
-        p0 = ' '.join(row[0].split()[1:-1])
-        # Check if the P0 name exists in the mapping dictionary
-        if p0 in nameMapping:
-            p0 = nameMapping[p0]
-
-        rawResources = {
-            'planet': planetType,
-            'p0': p0
-        }
-
-        planetP1List.append(rawResources)
-
-    # Close the connection
-    closeDBConnection(conn)
-    return planetP1List
-
 def sortPIData(piData,level):
     piData[level] = dict(sorted(piData[level].items()))
 
@@ -134,7 +103,7 @@ def getPIData():
         # Save the resource to piData
         if rawResource not in piData["P0"]:
             piData["P0"][rawResource] = {
-                "typeID" : [rawResourceID],
+                "typeID" : [rawResourceID][0][0],
                 "planetTypes": [planetType]
             }
         else:
@@ -149,19 +118,10 @@ def getPIData():
 
     # Close the connection
     conn.close()
-
     return piData
 
 def main():
-    print("EH")
     getPIData()
 
 if __name__ == "__main__":
     main()
-
-# White = Planet
-# Yellow = Resource
-# Green = Tier 1 Product (P1)
-# Aqua = Tier 2 Product (P2)
-# Blue = Tier 3 Product (P3)
-# Pink = Tier 4 Product (P4)
