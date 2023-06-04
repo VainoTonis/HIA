@@ -58,7 +58,6 @@ def main():
     scene = QGraphicsScene(0, 0, 800, 600)
 
     relationships = getP0Data()
-
     # Extract unique planet names and resource names
     planetTypes = list(set([relationship['planet'] for relationship in relationships]))
     rawResources = list(set([relationship['p0'] for relationship in relationships]))
