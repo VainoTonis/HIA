@@ -63,12 +63,12 @@ def writePISchemaComponents(piData,cursor,outputLevel):
     findEveryResourceInGroupQuery = "SELECT typeID, typeName FROM invTypes WHERE groupID IN (:groupID)"    
     cursor.execute(findEveryResourceInGroupQuery, {"groupID": groupID})
     endProducts = cursor.fetchall()
-
+    # Get the ingredients for all the end products and write them down under 
     for endProduct in endProducts:
         productID = endProduct[0]
         productName = endProduct[1]
 
-        allInputQuery = '''
+        ingredientsQuery = '''
         SELECT typeID FROM planetSchematicsTypeMap
         WHERE isInput = 1 
             AND schematicID = (
@@ -76,20 +76,23 @@ def writePISchemaComponents(piData,cursor,outputLevel):
                 WHERE isInput = 0 
                     AND typeID = (:outputID))
         '''
-        cursor.execute(allInputQuery, {"outputID": productID})
-        allInputs = cursor.fetchall()
+        cursor.execute(ingredientsQuery, {"outputID": productID})
+        ingredients = cursor.fetchall()
         if endProduct not in piData[outputLevel]:
             piData[outputLevel][productName] = {
                 "typeID" : productID,
-                "inputResource" : allInputs
+                "inputResource" : []
             }
+            # Ingridients come in a tuple, to avoid having a dictionary inside a dictionary that has a dictionary that has a list which has tuples and the tuples have Integers, i simply removed the tuple part which makes it mildly less interesting
+            for ingredient in ingredients:
+                piData[outputLevel][productName]["inputResource"].append(ingredient[0])
         else:
+            # This should NEVER happen
             print("wtf")
             exit()
 
     sortPIData(piData,outputLevel)
     return piData
-
 
 def getPIData():
     conn, cursor = connectToSDE()
@@ -124,33 +127,38 @@ def getPIData():
         # Get the typeID
         typeIDQuery = "SELECT typeID FROM invTypes WHERE typeName LIKE :resourceName"
         cursor.execute(typeIDQuery, {"resourceName": rawResource})
-        rawResourceID = cursor.fetchone()
+        rawResourceIDTuples = cursor.fetchone()
+        rawResourceID = []
+        for tpl in rawResourceIDTuples:
+            rawResourceID.append(tpl)
         # Save the resource to piData
         if rawResource not in piData["P0"]:
             piData["P0"][rawResource] = {
-                "typeID" : [rawResourceID][0][0],
+                "typeID" : [rawResourceID],
                 "planetTypes": [planetType]
             }
         else:
             piData["P0"][rawResource]["planetTypes"].append(planetType)
 
+    # Sorting and getting all the relational data regarding PI only things
     sortPIData(piData,"P0")
     writePISchemaComponents(piData,cursor,"P1")
     writePISchemaComponents(piData,cursor,"P2")
     writePISchemaComponents(piData,cursor,"P3")
     writePISchemaComponents(piData,cursor,"P4")
 
-    print(piData)
-    completePIResourceMap = []
-
     # Close the connection
     conn.close()
 
-    return completePIResourceMap
+    return piData
 
+def main():
+    print("EH")
+    getPIData()
 
+if __name__ == "__main__":
+    main()
 
-getPIData()
 # White = Planet
 # Yellow = Resource
 # Green = Tier 1 Product (P1)
