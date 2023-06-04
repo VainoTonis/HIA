@@ -42,30 +42,50 @@ def getP0Data():
 def sortPIData(piData,level):
     piData[level] = dict(sorted(piData[level].items()))
 
-def writePISchemaComponents(piData,cursor,inputLevel,outputLevel):
-    getOutputResourceTypeID = '''
-    SELECT typeID, typeName FROM invTypes 
-    WHERE typeID IN (
-        SELECT typeID FROM planetSchematicsTypeMap 
-        WHERE isInput = 0 
-            AND schematicID IN (
-                SELECT schematicID FROM planetSchematicsTypeMap 
-                WHERE isInput = 1 
-                    AND typeID IN (:inputTypes)))
-    '''
-    for resource in piData[inputLevel]:
-        inputTypeID = piData[inputLevel][resource]["typeID"]
-        cursor.execute(getOutputResourceTypeID, {"inputTypes": inputTypeID})
-        P1Name = cursor.fetchall()
+def writePISchemaComponents(piData,cursor,outputLevel):
 
-        for inputResource in P1Name:
-            if inputResource[1] not in piData[outputLevel]:
-                piData[outputLevel][inputResource[1]] = {
-                    "typeID" : inputResource[0],
-                    "inputResource" : [resource]
-                }
-            else:
-                piData[outputLevel][P1Name[0][1]]["inputResource"].append(resource)
+    # Manually setting the groupIDs of the final output
+    groupIDMapping = {
+        # P0 Wont be used but just in case marked it if it is eventually required
+        "P0" : [1032,1033,1035], # Solid, Liquid-gas, Organic 
+        "P1" : 1042,
+        "P2" : 1034,
+        "P3" : 1040,
+        "P4" : 1041
+    }
+
+    if outputLevel in groupIDMapping:
+        groupID = groupIDMapping[outputLevel]
+    else:
+        print("FALSE INPUT was given", outputLevel)
+        exit()
+
+    findEveryResourceInGroupQuery = "SELECT typeID, typeName FROM invTypes WHERE groupID IN (:groupID)"    
+    cursor.execute(findEveryResourceInGroupQuery, {"groupID": groupID})
+    endProducts = cursor.fetchall()
+
+    for endProduct in endProducts:
+        productID = endProduct[0]
+        productName = endProduct[1]
+
+        allInputQuery = '''
+        SELECT typeID FROM planetSchematicsTypeMap
+        WHERE isInput = 1 
+            AND schematicID = (
+                SELECT schematicID FROM planetSchematicsTypeMap
+                WHERE isInput = 0 
+                    AND typeID = (:outputID))
+        '''
+        cursor.execute(allInputQuery, {"outputID": productID})
+        allInputs = cursor.fetchall()
+        if endProduct not in piData[outputLevel]:
+            piData[outputLevel][productName] = {
+                "typeID" : productID,
+                "inputResource" : allInputs
+            }
+        else:
+            print("wtf")
+            exit()
 
     sortPIData(piData,outputLevel)
     return piData
@@ -115,10 +135,12 @@ def getPIData():
             piData["P0"][rawResource]["planetTypes"].append(planetType)
 
     sortPIData(piData,"P0")
-    writePISchemaComponents(piData,cursor,"P0","P1")
-    writePISchemaComponents(piData,cursor,"P1","P2")
-    writePISchemaComponents(piData,cursor,"P2","P3")
+    writePISchemaComponents(piData,cursor,"P1")
+    writePISchemaComponents(piData,cursor,"P2")
+    writePISchemaComponents(piData,cursor,"P3")
+    writePISchemaComponents(piData,cursor,"P4")
 
+    print(piData)
     completePIResourceMap = []
 
     # Close the connection
