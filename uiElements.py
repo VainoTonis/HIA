@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
 from PyQt6.QtGui import QPen, QColor, QLinearGradient,QBrush
 from PyQt6.QtCore import QPointF
 
+#This handles logic for hovering, both colour changes and connection creation init
 class hoverableTextItem(QGraphicsTextItem):
     def __init__(self, text):
         super().__init__(text)
@@ -14,6 +15,8 @@ class hoverableTextItem(QGraphicsTextItem):
         if isinstance(self, resourceTextItem):
             self.setDefaultTextColor(QColor(self.resourceColour))
         else:
+            # This should NEVER happen as resourceTextItem requires the resourceTier to be set
+            # Also if the value is not one of 5 in the mapping it should never get here either
             SystemError("no resource colour found (AKA something very bad happened)")
         super().hoverEnterEvent(event)
 
@@ -22,6 +25,8 @@ class hoverableTextItem(QGraphicsTextItem):
         self.setDefaultTextColor(QColor('gray'))
         super().hoverLeaveEvent(event)
 
+# Created a custom class to hold the resource name and its colour mapping
+# Might add connections aswell, not sure
 class resourceTextItem(hoverableTextItem):
     def __init__(self, text, resourceLevel):
         super().__init__(text)
@@ -36,10 +41,11 @@ class resourceTextItem(hoverableTextItem):
         if resourceLevel in resourceColourMapping:
             self.lines = {}  # Store lines in a dictionary
             self.resourceColour = resourceColourMapping[resourceLevel]
+            self.resourceLevel = resourceLevel
         else:
             SystemError("FALSE INPUT was given", resourceLevel)
 
-
+# Creates the line between ingridient and product, with a nice gradient of colour changing into the next Tier
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
     connection = QGraphicsLineItem(
         ingredient.pos().x() + ingredient.boundingRect().width(),
@@ -71,7 +77,7 @@ def createConnection(scene, ingredient, ingredientColour, product, productColour
     scene.addItem(connection)
     return connection
 
-
+# This creates the text items for every type of resource
 def createResourceTextItems(scene, piData, endProductLevel, staticGap):
     targetTextItems = []
     processedResources = set()  # Set to store processed resources
@@ -85,12 +91,11 @@ def createResourceTextItems(scene, piData, endProductLevel, staticGap):
     
     return targetTextItems
 
-# This is to display both Planet and P0 resources
+# Creates text items for Planet and P0 resources since P0 structure is a bit different to P1-P4
 def createInitialTextItems(scene, piData):
     targetTextItems = []
     rawResourceTextItems = []
-    processed_planets = set()  # Set to store processed planets
-    # Iterate over the P0 data
+    processed_planets = set()
     for rawResource, planetType in piData["P0"].items():
         planetTypes = planetType["planetTypes"]
         
