@@ -5,65 +5,39 @@ from PyQt6.QtCore import QPointF
 class hoverableTextItem(QGraphicsTextItem):
     def __init__(self, text):
         super().__init__(text)
-        self.setDefaultTextColor(QColor('gray'))  # Set the text color to gray
+        defaultColour = "gray"
+        self.setDefaultTextColor(QColor(defaultColour))  # Set the text color to gray
         self.setAcceptHoverEvents(True)
         self.connections = []  # Initialize the connections attribute as a list
 
     def hoverEnterEvent(self, event):
-        if isinstance(self, planetTextItem):
-            self.setDefaultTextColor(QColor('white'))
-            for connection in self.connections:
-                if isinstance(connection, QGraphicsLineItem):
-                    connection.setVisible(True)
-                    if isinstance(connection.dest_item, rawResourceTextItem):
-                        connection.dest_item.setDefaultTextColor(QColor('yellow'))
-        elif isinstance(self, rawResourceTextItem):
-            self.setDefaultTextColor(QColor('yellow'))
-            for connection in self.connections:
-                if isinstance(connection, QGraphicsLineItem):
-                    connection.setVisible(True)
-                    if isinstance(connection.src_item, planetTextItem):
-                        connection.src_item.setDefaultTextColor(QColor('white'))
+        if isinstance(self, resourceTextItem):
+            self.setDefaultTextColor(QColor(self.resourceColour))
+        else:
+            SystemError("no resource colour found (AKA something very bad happened)")
         super().hoverEnterEvent(event)
 
 
     def hoverLeaveEvent(self, event):
-        if isinstance(self, planetTextItem):
-            self.setDefaultTextColor(QColor('gray'))
-            for connection in self.connections:
-                if isinstance(connection, QGraphicsLineItem):
-                    connection.setVisible(False)
-                    if isinstance(connection.dest_item, rawResourceTextItem):
-                        connection.dest_item.setDefaultTextColor(QColor('gray'))
-        elif isinstance(self, rawResourceTextItem):
-            self.setDefaultTextColor(QColor('gray'))
-            for connection in self.connections:
-                if isinstance(connection, QGraphicsLineItem):
-                    connection.setVisible(False)
-                    if isinstance(connection.src_item, planetTextItem):
-                        connection.src_item.setDefaultTextColor(QColor('gray'))
+        self.setDefaultTextColor(QColor('gray'))
         super().hoverLeaveEvent(event)
 
-class planetTextItem(hoverableTextItem):
-    def __init__(self, text):
-        super().__init__(text)
-        self.lines = {}  # Store lines in a dictionary
-
-class rawResourceTextItem(hoverableTextItem):
-    def __init__(self, text):
-        super().__init__(text)
-        self.lines = {}  # Store lines in a dictionary
-
 class resourceTextItem(hoverableTextItem):
-    def __init__(self, text):
+    def __init__(self, text, resourceLevel):
         super().__init__(text)
-        self.lines = {}  # Store lines in a dictionary
-    # White = Planet
-    # Yellow = Resource
-    # Green = Tier 1 Product (P1)
-    # Aqua = Tier 2 Product (P2)
-    # Blue = Tier 3 Product (P3)
-    # Pink = Tier 4 Product (P4)
+        resourceColourMapping = {
+            "Planet" : "White",
+            "P0" : "Yellow",
+            "P1" : "Green",
+            "P2" : "Aqua",
+            "P3" : "Blue",
+            "P4" : "Pink"
+        }
+        if resourceLevel in resourceColourMapping:
+            self.lines = {}  # Store lines in a dictionary
+            self.resourceColour = resourceColourMapping[resourceLevel]
+        else:
+            SystemError("FALSE INPUT was given", resourceLevel)
 
 
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
@@ -100,14 +74,14 @@ def createConnection(scene, ingredient, ingredientColour, product, productColour
 
 def createResourceTextItems(scene, piData, endProductLevel, staticGap):
     targetTextItems = []
-    processedResources = set()  # Set to store processed planets
-    # Iterate over the P0 data
+    processedResources = set()  # Set to store processed resources
+    # Iterate over the product data
     for i in piData[endProductLevel].items():
-        resourceText = rawResourceTextItem(i[0])
+        resourceText = resourceTextItem(i[0], endProductLevel)
         resourceText.setPos(staticGap , 150 + len(targetTextItems) * 20)
         scene.addItem(resourceText)
         targetTextItems.append(resourceText)
-        processedResources.add(i[0])  # Add processed planet to set
+        processedResources.add(i[0])  # Add processed resource to set
     
     return targetTextItems
 
@@ -125,13 +99,13 @@ def createInitialTextItems(scene, piData):
             if planetType in processed_planets:
                 continue
 
-            planetText = planetTextItem(planetType)
+            planetText = resourceTextItem(planetType, "Planet")
             planetText.setPos(25 , 150 + len(targetTextItems) * 20)
             scene.addItem(planetText)
             targetTextItems.append(planetText)
             processed_planets.add(planetType)  # Add processed planet to set
     
-        rawResourceText = rawResourceTextItem(rawResource)
+        rawResourceText = resourceTextItem(rawResource, "P0")
         rawResourceText.setPos(125, 150 + len(rawResourceTextItems) * 20)
         scene.addItem(rawResourceText)
         rawResourceTextItems.append(rawResourceText)
