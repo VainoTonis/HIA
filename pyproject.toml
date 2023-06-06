@@ -2,14 +2,13 @@
 name = "eia"
 version = "0.0.1"
 description = "Managing EVE industry"
-authors = ["Tõnis Vaino <vaino.tonis@gmail.com>"]
-license = "no-use"
+authors = ["Tõnis Vaino <headtrollhunter@gmail.com>"]
+license = "GPL v3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pyqt6 = "^6.5.0"
-jinja2 = "^3.1.2"
 
 
 [build-system]
