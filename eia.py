@@ -7,7 +7,7 @@ def main():
     app = QApplication([])
 
     # Create a QGraphicsScene and set the scene rect
-    scene = QGraphicsScene(0, 0, 1100, 800)
+    scene = QGraphicsScene(0, 0, 1100, 600)
     # Extract unique planet names and resource names
     piData = getPIData()
 

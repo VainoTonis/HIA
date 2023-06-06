@@ -84,7 +84,7 @@ def createResourceTextItems(scene, piData, endProductLevel, staticGap):
     # Iterate over the product data
     for i in piData[endProductLevel].items():
         resourceText = resourceTextItem(i[0], endProductLevel)
-        resourceText.setPos(staticGap , 150 + len(targetTextItems) * 20)
+        resourceText.setPos(staticGap , 25 + len(targetTextItems) * 20)
         scene.addItem(resourceText)
         targetTextItems.append(resourceText)
         processedResources.add(i[0])  # Add processed resource to set
@@ -105,12 +105,12 @@ def createInitialTextItems(scene, piData):
                 continue
 
             planetText = resourceTextItem(planetType, "Planet")
-            planetText.setPos(25 , 150 + len(targetTextItems) * 20)
+            planetText.setPos(25 , 25 + len(targetTextItems) * 20)
             scene.addItem(planetText)
             targetTextItems.append(planetText)
             processed_planets.add(planetType)  # Add processed planet to set
     
         rawResourceText = resourceTextItem(rawResource, "P0")
-        rawResourceText.setPos(125, 150 + len(rawResourceTextItems) * 20)
+        rawResourceText.setPos(125, 25 + len(rawResourceTextItems) * 20)
         scene.addItem(rawResourceText)
         rawResourceTextItems.append(rawResourceText)
