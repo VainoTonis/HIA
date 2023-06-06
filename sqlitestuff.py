@@ -136,7 +136,7 @@ def getPIData():
     return piData
 
 def main():
-    getPIData()
+    print("Wrong file m8")
 
 if __name__ == "__main__":
     main()

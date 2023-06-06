@@ -9,7 +9,6 @@ You should have received a copy of the GNU General Public License along with EIA
 """
 from PyQt6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
 from PyQt6.QtGui import QPen, QColor, QLinearGradient,QBrush
-from PyQt6.QtCore import QPointF
 
 #This handles logic for hovering, both colour changes and connection creation init
 class hoverableTextItem(QGraphicsTextItem):
@@ -23,15 +22,18 @@ class hoverableTextItem(QGraphicsTextItem):
     def hoverEnterEvent(self, event):
         if isinstance(self, resourceTextItem):
             self.setDefaultTextColor(QColor(self.resourceColour))
+            for connection in self.connections:
+                connection.setVisible(True)
         else:
             # This should NEVER happen as resourceTextItem requires the resourceTier to be set
             # Also if the value is not one of 5 in the mapping it should never get here either
             SystemError("no resource colour found (AKA something very bad happened)")
         super().hoverEnterEvent(event)
 
-
     def hoverLeaveEvent(self, event):
         self.setDefaultTextColor(QColor('gray'))
+        for connection in self.connections:
+            connection.setVisible(False)
         super().hoverLeaveEvent(event)
 
 # Created a custom class to hold the resource name and its colour mapping
@@ -50,9 +52,8 @@ class resourceTextItem(hoverableTextItem):
         if resourceLevel in resourceColourMapping:
             self.lines = {}  # Store lines in a dictionary
             self.resourceColour = resourceColourMapping[resourceLevel]
-            self.resourceLevel = resourceLevel
         else:
-            SystemError("FALSE INPUT was given", resourceLevel)
+            raise SystemError("FALSE INPUT was given", resourceLevel)
 
 # Creates the line between ingridient and product, with a nice gradient of colour changing into the next Tier
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
@@ -88,21 +89,36 @@ def createConnection(scene, ingredient, ingredientColour, product, productColour
 
 # This creates the text items for every type of resource
 def createResourceTextItems(scene, piData, endProductLevel, staticGap):
+    productLevels = {
+            "P0" : 0,
+            "P1" : 1,
+            "P2" : 2,
+            "P3" : 3,
+            "P4" : 4
+        }
     targetTextItems = []
     processedResources = set()  # Set to store processed resources
     # Iterate over the product data
-    for i in piData[endProductLevel].items():
-        resourceText = resourceTextItem(i[0], endProductLevel)
+    for endProductName, endProductData in piData[endProductLevel].items():
+        resourceText = resourceTextItem(endProductName, endProductLevel)
         resourceText.setPos(staticGap , 25 + len(targetTextItems) * 20)
         scene.addItem(resourceText)
         targetTextItems.append(resourceText)
-        processedResources.add(i[0])  # Add processed resource to set
-    
+        processedResources.add(endProductName)  # Add processed resource to set
+
+        inputResources = endProductData["inputResource"]
+        print(len(targetTextItems))
+        for targetTextItem in targetTextItems:
+            print(targetTextItem.toPlainText())
+
+        # for inputResource in inputResources:
+        #     print(inputResource)
+
     return targetTextItems
 
 # Creates text items for Planet and P0 resources since P0 structure is a bit different to P1-P4
 def createInitialTextItems(scene, piData):
-    targetTextItems = []
+    planetTextItems = []
     rawResourceTextItems = []
     processed_planets = set()
     for rawResource, planetType in piData["P0"].items():
@@ -114,12 +130,17 @@ def createInitialTextItems(scene, piData):
                 continue
 
             planetText = resourceTextItem(planetType, "Planet")
-            planetText.setPos(25 , 25 + len(targetTextItems) * 20)
+            planetText.setPos(25 , 25 + len(planetTextItems) * 20)
             scene.addItem(planetText)
-            targetTextItems.append(planetText)
+            planetTextItems.append(planetText)
             processed_planets.add(planetType)  # Add processed planet to set
     
         rawResourceText = resourceTextItem(rawResource, "P0")
         rawResourceText.setPos(125, 25 + len(rawResourceTextItems) * 20)
         scene.addItem(rawResourceText)
         rawResourceTextItems.append(rawResourceText)
+
+         # Create connections between planets and raw resources
+        for planetTextItem in planetTextItems:
+            if planetTextItem.toPlainText() in planetTypes:
+                createConnection(scene, planetTextItem, planetTextItem.resourceColour, rawResourceText, rawResourceText.resourceColour)
