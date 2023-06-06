@@ -8,9 +8,6 @@ def connectToSDE():
 def closeDBConnection(conn):
     conn.close()
 
-def sortPIData(piData,level):
-    piData[level] = dict(sorted(piData[level].items()))
-
 def writePISchemaComponents(piData,cursor,outputLevel):
 
     # Manually setting the groupIDs of the final output
@@ -60,7 +57,16 @@ def writePISchemaComponents(piData,cursor,outputLevel):
             print("wtf")
             exit()
 
-    sortPIData(piData,outputLevel)
+    if outputLevel == "P1":
+        def findTypeIDIndex(typeID, P0):
+            for index, key in enumerate(P0):
+                if P0[key]['typeID'] == typeID:
+                    return index
+            return -1
+        piData[outputLevel] = dict(sorted(piData["P1"].items(), key=lambda item: findTypeIDIndex(item[1]['inputResource'][0], piData["P0"])))
+    else:
+        piData[outputLevel] = dict(sorted(piData[outputLevel].items()))
+        
     return piData
 
 def getPIData():
@@ -110,7 +116,7 @@ def getPIData():
             piData["P0"][rawResource]["planetTypes"].append(planetType)
 
     # Sorting and getting all the relational data regarding PI only things
-    sortPIData(piData,"P0")
+    piData["P0"] = dict(sorted(piData["P0"].items()))
     writePISchemaComponents(piData,cursor,"P1")
     writePISchemaComponents(piData,cursor,"P2")
     writePISchemaComponents(piData,cursor,"P3")
