@@ -14,6 +14,3 @@ I  am not sure where this project is heading (Project completion and garbage bin
 # Requirements
 
 Atm while developing im using a seperate postgres server for my DB, depending how much people want other options i am willing to maybe think of sqlite or something similar. (Yes this app requires a database, i dont want to mess with 10 billion text files or massive CSV files like a caveman)
-
-# Licence
-TODO: ADD LICENCE
