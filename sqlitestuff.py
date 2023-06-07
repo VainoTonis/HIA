@@ -44,23 +44,22 @@ def writePISchemaComponents(piData,cursor,outputLevel):
         productName = endProduct[1]
 
         ingredientsQuery = '''
-        SELECT typeID FROM planetSchematicsTypeMap
-        WHERE isInput = 1 
-            AND schematicID = (
-                SELECT schematicID FROM planetSchematicsTypeMap
-                WHERE isInput = 0 
-                    AND typeID = (:outputID))
+        SELECT typeName FROM invTypes 
+        WHERE typeID IN (
+            SELECT typeID FROM planetSchematicsTypeMap
+            WHERE isInput = 1 
+                AND schematicID = (
+                    SELECT schematicID FROM planetSchematicsTypeMap
+                    WHERE isInput = 0 
+                        AND typeID = (:outputID)))
         '''
         cursor.execute(ingredientsQuery, {"outputID": productID})
         ingredients = cursor.fetchall()
         if endProduct not in piData[outputLevel]:
-            piData[outputLevel][productName] = {
-                "typeID" : productID,
-                "inputResource" : []
-            }
+            piData[outputLevel][productName] = []
             # Ingridients come in a tuple, to avoid having a dictionary inside a dictionary that has a dictionary that has a list which has tuples and the tuples have Integers, i simply removed the tuple part which makes it mildly less interesting
             for ingredient in ingredients:
-                piData[outputLevel][productName]["inputResource"].append(ingredient[0])
+                piData[outputLevel][productName].append(ingredient[0])
         else:
             # This should NEVER happen
             print("wtf")
@@ -69,10 +68,10 @@ def writePISchemaComponents(piData,cursor,outputLevel):
     if outputLevel == "P1":
         def findTypeIDIndex(typeID, P0):
             for index, key in enumerate(P0):
-                if P0[key]['typeID'] == typeID:
+                if key == typeID:
                     return index
             return -1
-        piData[outputLevel] = dict(sorted(piData["P1"].items(), key=lambda item: findTypeIDIndex(item[1]['inputResource'][0], piData["P0"])))
+        piData[outputLevel] = dict(sorted(piData["P1"].items(), key=lambda item: findTypeIDIndex(item[1][0], piData["P0"])))
     else:
         piData[outputLevel] = dict(sorted(piData[outputLevel].items()))
         
@@ -107,22 +106,12 @@ def getPIData():
         # Check if the P0 name exists in the mapping dictionary
         if rawResource in nameMapping:
             rawResource = nameMapping[rawResource]
-
-        # Get the typeID
-        typeIDQuery = "SELECT typeID FROM invTypes WHERE typeName LIKE :resourceName"
-        cursor.execute(typeIDQuery, {"resourceName": rawResource})
-        rawResourceIDTuples = cursor.fetchone()
-        rawResourceID = []
-        for tpl in rawResourceIDTuples:
-            rawResourceID.append(tpl)
+    
         # Save the resource to piData
         if rawResource not in piData["P0"]:
-            piData["P0"][rawResource] = {
-                "typeID" : [rawResourceID][0][0],
-                "planetTypes": [planetType]
-            }
+            piData["P0"][rawResource] = [planetType]
         else:
-            piData["P0"][rawResource]["planetTypes"].append(planetType)
+            piData["P0"][rawResource].append(planetType)
 
     # Sorting and getting all the relational data regarding PI only things
     piData["P0"] = dict(sorted(piData["P0"].items()))
