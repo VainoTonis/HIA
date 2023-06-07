@@ -42,7 +42,7 @@ class resourceTextItem(hoverableTextItem):
     def __init__(self, text, resourceLevel):
         super().__init__(text)
         resourceColourMapping = {
-            "Planet" : "White",
+            "Planets" : "White",
             "P0" : "Yellow",
             "P1" : "Green",
             "P2" : "Aqua",
@@ -57,7 +57,7 @@ class resourceTextItem(hoverableTextItem):
 
 def initializePlanetConnections(scene, piData ,  planetTextItems, p0TextItems):
     for rawResource, planetType in piData["P0"].items():
-        planetTypes = planetType["planetTypes"]
+        planetTypes = planetType
         
         # Get the raw resource textItem to connect with
         for textItem in p0TextItems:
@@ -70,6 +70,39 @@ def initializePlanetConnections(scene, piData ,  planetTextItems, p0TextItems):
                 createConnection(scene, planetTextItem, planetTextItem.resourceColour, p0TextItem, p0TextItem.resourceColour)
 
 
+def initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
+    currentProductLevel = -1
+    productLevels = {
+            -1 : "Planets",
+            0 : "P0",
+            1 : "P1",
+            2 : "P2",
+            3 : "P3",
+            4 : "P4"
+        }
+    
+    # Create a dictionary to map product names to their text items
+    textItemMapping = {}
+    for productList in [planetTextItems, p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems]:
+        for textItem in productList:
+            textItemMapping[textItem.toPlainText()] = textItem
+    
+    for products in [p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems]:
+        currentProductLevel += 1
+        for product in products:
+            productName = product.toPlainText()
+            inputResources = piData[productLevels[currentProductLevel]][product.toPlainText()]
+            potentialInputs = piData[productLevels[currentProductLevel - 1]]
+            
+            # Get the corresponding text items for each input
+            inputTextItems = [textItemMapping[inputName] for inputName in inputResources if inputName in textItemMapping]
+            
+            # Now you can create connections between the product text item and the input text items
+            for inputTextItem in inputTextItems:
+                createConnection(scene, inputTextItem, inputTextItem.resourceColour, product, product.resourceColour)
+                pass
+
+    
 # Creates the line between ingridient and product, with a nice gradient of colour changing into the next Tier
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
     connection = QGraphicsLineItem(
@@ -118,42 +151,22 @@ def createResourceTextItems(scene, piData, endProductLevel, columnXPosition):
     return targetTextItems
 
 # Creates text items for Planet and P0 resources since P0 structure is a bit different to P1-P4
-def createInitialTextItems(scene, piData):
+def createPlanetTextItems(scene, piData, planetParent, columnXPosition):
     planetTextItems = []
-    rawResourceTextItems = []
-    uniquePlanets = set()
     processedPlanets = set()
+
+    planetTypes = piData[planetParent]
     
-    # Created this to get all the unique planets before to get the positioning, probaly could have done a SQL query to get all the planets
-    for planets in piData["P0"].items():
-        planets = planets[1]["planetTypes"]
+    # Create planetTextItem for each planet type
+    for planetType in planetTypes:
+        if planetType in processedPlanets:
+            continue
 
-        for planet in planets:
-            if planet in uniquePlanets:
-                continue
-            else:
-                uniquePlanets.add(planet)
+        columnYPosition = (scene.height() - len(piData[planetParent]) * 20) / 2
+        planetText = resourceTextItem(planetType, planetParent)
+        planetText.setPos(columnXPosition , columnYPosition + len(processedPlanets) * 20)
+        scene.addItem(planetText)
+        planetTextItems.append(planetText)
+        processedPlanets.add(planetType)
 
-    for rawResource, planetType in piData["P0"].items():
-        planetTypes = planetType["planetTypes"]
-        
-        # Create planetTextItem for each planet type
-        for planetType in planetTypes:
-            if planetType in processedPlanets:
-                continue
-
-            columnYPosition = (scene.height() - len(uniquePlanets) * 20) / 2
-            planetText = resourceTextItem(planetType, "Planet")
-            planetText.setPos(25 , columnYPosition + len(processedPlanets) * 20)
-            scene.addItem(planetText)
-            planetTextItems.append(planetText)
-            processedPlanets.add(planetType)
-
-    
-        columnYPosition = (scene.height() - len(piData["P0"]) * 20) / 2
-        rawResourceText = resourceTextItem(rawResource, "P0")
-        rawResourceText.setPos(125, columnYPosition + len(rawResourceTextItems) * 20)
-        scene.addItem(rawResourceText)
-        rawResourceTextItems.append(rawResourceText)
-
-    return planetTextItems, rawResourceTextItems
+    return planetTextItems
