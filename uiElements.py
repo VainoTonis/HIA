@@ -88,31 +88,17 @@ def createConnection(scene, ingredient, ingredientColour, product, productColour
     return connection
 
 # This creates the text items for every type of resource
-def createResourceTextItems(scene, piData, endProductLevel, staticGap):
-    productLevels = {
-            "P0" : 0,
-            "P1" : 1,
-            "P2" : 2,
-            "P3" : 3,
-            "P4" : 4
-        }
+def createResourceTextItems(scene, piData, endProductLevel, columnXPosition):
     targetTextItems = []
     processedResources = set()  # Set to store processed resources
+    columnYPosition = (scene.height() - len(piData[endProductLevel]) * 20) / 2
     # Iterate over the product data
     for endProductName, endProductData in piData[endProductLevel].items():
         resourceText = resourceTextItem(endProductName, endProductLevel)
-        resourceText.setPos(staticGap , 25 + len(targetTextItems) * 20)
+        resourceText.setPos(columnXPosition , columnYPosition + len(targetTextItems) * 20)
         scene.addItem(resourceText)
         targetTextItems.append(resourceText)
         processedResources.add(endProductName)  # Add processed resource to set
-
-        inputResources = endProductData["inputResource"]
-        print(len(targetTextItems))
-        for targetTextItem in targetTextItems:
-            print(targetTextItem.toPlainText())
-
-        # for inputResource in inputResources:
-        #     print(inputResource)
 
     return targetTextItems
 
@@ -120,27 +106,37 @@ def createResourceTextItems(scene, piData, endProductLevel, staticGap):
 def createInitialTextItems(scene, piData):
     planetTextItems = []
     rawResourceTextItems = []
-    processed_planets = set()
+    uniquePlanets = set()
+    processedPlanets = set()
+    
+    # Created this to get all the unique planets before to get the positioning, probaly could have done a SQL query to get all the planets
+    for planets in piData["P0"].items():
+        planets = planets[1]["planetTypes"]
+
+        for planet in planets:
+            if planet in uniquePlanets:
+                continue
+            else:
+                uniquePlanets.add(planet)
+
     for rawResource, planetType in piData["P0"].items():
         planetTypes = planetType["planetTypes"]
         
         # Create planetTextItem for each planet type
         for planetType in planetTypes:
-            if planetType in processed_planets:
+            if planetType in processedPlanets:
                 continue
 
+            columnYPosition = (scene.height() - len(uniquePlanets) * 20) / 2
             planetText = resourceTextItem(planetType, "Planet")
-            planetText.setPos(25 , 25 + len(planetTextItems) * 20)
+            planetText.setPos(25 , columnYPosition + len(processedPlanets) * 20)
             scene.addItem(planetText)
             planetTextItems.append(planetText)
-            processed_planets.add(planetType)  # Add processed planet to set
+            processedPlanets.add(planetType)
+
     
+        columnYPosition = (scene.height() - len(piData["P0"]) * 20) / 2
         rawResourceText = resourceTextItem(rawResource, "P0")
-        rawResourceText.setPos(125, 25 + len(rawResourceTextItems) * 20)
+        rawResourceText.setPos(125, columnYPosition + len(rawResourceTextItems) * 20)
         scene.addItem(rawResourceText)
         rawResourceTextItems.append(rawResourceText)
-
-         # Create connections between planets and raw resources
-        for planetTextItem in planetTextItems:
-            if planetTextItem.toPlainText() in planetTypes:
-                createConnection(scene, planetTextItem, planetTextItem.resourceColour, rawResourceText, rawResourceText.resourceColour)
