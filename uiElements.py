@@ -55,6 +55,21 @@ class resourceTextItem(hoverableTextItem):
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
+def initializePlanetConnections(scene, piData ,  planetTextItems, p0TextItems):
+    for rawResource, planetType in piData["P0"].items():
+        planetTypes = planetType["planetTypes"]
+        
+        # Get the raw resource textItem to connect with
+        for textItem in p0TextItems:
+            if textItem.toPlainText() == rawResource:
+                p0TextItem = textItem
+        # Get the planetTextItem that the P0 resource exists 
+        # and Create a connection based on that
+        for planetTextItem in planetTextItems:
+            if planetTextItem.toPlainText() in planetTypes:
+                createConnection(scene, planetTextItem, planetTextItem.resourceColour, p0TextItem, p0TextItem.resourceColour)
+
+
 # Creates the line between ingridient and product, with a nice gradient of colour changing into the next Tier
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
     connection = QGraphicsLineItem(
@@ -140,3 +155,5 @@ def createInitialTextItems(scene, piData):
         rawResourceText.setPos(125, columnYPosition + len(rawResourceTextItems) * 20)
         scene.addItem(rawResourceText)
         rawResourceTextItems.append(rawResourceText)
+
+    return planetTextItems, rawResourceTextItems
