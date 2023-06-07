@@ -22,7 +22,7 @@ def writePISchemaComponents(piData,cursor,outputLevel):
     # Manually setting the groupIDs of the final output
     groupIDMapping = {
         # P0 Wont be used but just in case marked it if it is eventually required
-        "P0" : [1032,1033,1035], # Solid, Liquid-gas, Organic 
+        "P0" : "1032,1033,1035", # Solid, Liquid-gas, Organic 
         "P1" : 1042,
         "P2" : 1034,
         "P3" : 1040,
@@ -87,6 +87,7 @@ def getPIData():
     results = cursor.fetchall()
     # Create a dictionary structure to hold the data for each tier of resource
     piData = {
+        "Planets" : [],
         "P0": {},
         "P1": {},
         "P2": {},
@@ -98,6 +99,8 @@ def getPIData():
     nameMapping = {
         'Aqueous Liquid': 'Aqueous Liquids',
     }
+
+    uniquePlanets = []
 
     # Get the planet and the raw resources that are being able to be collected
     for row in results:
@@ -113,8 +116,15 @@ def getPIData():
         else:
             piData["P0"][rawResource].append(planetType)
 
+        if planetType not in uniquePlanets:
+            piData["Planets"].append(planetType)
+            uniquePlanets.append(planetType)
+
+
     # Sorting and getting all the relational data regarding PI only things
     piData["P0"] = dict(sorted(piData["P0"].items()))
+
+    writePISchemaComponents(piData,cursor,"P0")
     writePISchemaComponents(piData,cursor,"P1")
     writePISchemaComponents(piData,cursor,"P2")
     writePISchemaComponents(piData,cursor,"P3")
