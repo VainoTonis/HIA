@@ -77,10 +77,12 @@ def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelatio
         for connection in connectedItem.connections:
             if flipSearch:
                 itemSearchDirection = connection.srcItem
+                itemSearchDirection2 = connection.destItem
             else:
                 itemSearchDirection = connection.destItem
+                itemSearchDirection2 = connection.srcItem
 
-            if itemSearchDirection.toPlainText() != anchoredPlainText:
+            if itemSearchDirection2.toPlainText() != anchoredPlainText:
                 continue
 
             recurseivlyAnchoredPlainText = itemSearchDirection.toPlainText()
@@ -92,7 +94,7 @@ def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelatio
                 connection.setVisible(False)
                 connectedItem.setDefaultTextColor(QColor(defaultColour))
 
-            # recursiveConnectionRelationships(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
+            recursiveConnectionRelationships(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
 
 def initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
     currentProductLevel = -1
