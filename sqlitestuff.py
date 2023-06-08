@@ -10,7 +10,7 @@ You should have received a copy of the GNU General Public License along with EIA
 from sqlite3 import connect
 
 def connectToSDE():
-    conn = connect('sqlite/evesde.sqlite')
+    conn = connect('sqlite/sqlite-latest.sqlite')
     cursor = conn.cursor()
     return conn, cursor
 
