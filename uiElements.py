@@ -10,11 +10,28 @@ You should have received a copy of the GNU General Public License along with EIA
 from PyQt6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
 from PyQt6.QtGui import QPen, QColor, QLinearGradient,QBrush
 
+defaultColour = "gray"
+productLevels = {
+        -1 : "Planets",
+        0 : "P0",
+        1 : "P1",
+        2 : "P2",
+        3 : "P3",
+        4 : "P4"
+    }
+
+resourceColourMapping = {
+    "Planets" : "White",
+    "P0" : "Yellow",
+    "P1" : "Green",
+    "P2" : "Aqua",
+    "P3" : "Blue",
+    "P4" : "Pink"
+}
 #This handles logic for hovering, both colour changes and connection creation init
 class hoverableTextItem(QGraphicsTextItem):
     def __init__(self, text):
         super().__init__(text)
-        defaultColour = "gray"
         self.setDefaultTextColor(QColor(defaultColour))  # Set the text color to gray
         self.setAcceptHoverEvents(True)
         self.connections = []  # Initialize the connections attribute as a list
@@ -22,8 +39,7 @@ class hoverableTextItem(QGraphicsTextItem):
     def hoverEnterEvent(self, event):
         if isinstance(self, resourceTextItem):
             self.setDefaultTextColor(QColor(self.resourceColour))
-            for connection in self.connections:
-                connection.setVisible(True)
+            self.connectionRelationships(True)
         else:
             # This should NEVER happen as resourceTextItem requires the resourceTier to be set
             # Also if the value is not one of 5 in the mapping it should never get here either
@@ -31,55 +47,55 @@ class hoverableTextItem(QGraphicsTextItem):
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        self.setDefaultTextColor(QColor('gray'))
-        for connection in self.connections:
-            connection.setVisible(False)
+        self.setDefaultTextColor(QColor(defaultColour))
+        self.connectionRelationships(False)
         super().hoverLeaveEvent(event)
+
+    def connectionRelationships(self, showRelationships):
+        anchoredPlainText = self.toPlainText()
+        for connection in self.connections:
+            connectedItem = connection.destItem if connection.srcItem == self else connection.srcItem
+            if connectedItem.resourceLevel == self.resourceLevel:
+                break
+            recursiveConnectionRelationships(anchoredPlainText, False, showRelationships, connectedItem)
+            recursiveConnectionRelationships(anchoredPlainText, True, showRelationships, connectedItem)
+            
 
 # Created a custom class to hold the resource name and its colour mapping
 # Might add connections aswell, not sure
 class resourceTextItem(hoverableTextItem):
     def __init__(self, text, resourceLevel):
         super().__init__(text)
-        resourceColourMapping = {
-            "Planets" : "White",
-            "P0" : "Yellow",
-            "P1" : "Green",
-            "P2" : "Aqua",
-            "P3" : "Blue",
-            "P4" : "Pink"
-        }
         if resourceLevel in resourceColourMapping:
             self.lines = {}  # Store lines in a dictionary
             self.resourceColour = resourceColourMapping[resourceLevel]
+            self.resourceLevel = resourceLevel
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
-def initializePlanetConnections(scene, piData ,  planetTextItems, p0TextItems):
-    for rawResource, planetType in piData["P0"].items():
-        planetTypes = planetType
-        
-        # Get the raw resource textItem to connect with
-        for textItem in p0TextItems:
-            if textItem.toPlainText() == rawResource:
-                p0TextItem = textItem
-        # Get the planetTextItem that the P0 resource exists 
-        # and Create a connection based on that
-        for planetTextItem in planetTextItems:
-            if planetTextItem.toPlainText() in planetTypes:
-                createConnection(scene, planetTextItem, planetTextItem.resourceColour, p0TextItem, p0TextItem.resourceColour)
+def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelationships, connectedItem):
+        for connection in connectedItem.connections:
+            if flipSearch:
+                itemSearchDirection = connection.srcItem
+            else:
+                itemSearchDirection = connection.destItem
 
+            if itemSearchDirection.toPlainText() != anchoredPlainText:
+                continue
+
+            recurseivlyAnchoredPlainText = itemSearchDirection.toPlainText()
+            recurseivlyConnectedItem = itemSearchDirection
+            if showRelationships == True:
+                connection.setVisible(True)
+                connectedItem.setDefaultTextColor(QColor(connectedItem.resourceColour))
+            else:
+                connection.setVisible(False)
+                connectedItem.setDefaultTextColor(QColor(defaultColour))
+
+            # recursiveConnectionRelationships(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
 
 def initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
     currentProductLevel = -1
-    productLevels = {
-            -1 : "Planets",
-            0 : "P0",
-            1 : "P1",
-            2 : "P2",
-            3 : "P3",
-            4 : "P4"
-        }
     
     # Create a dictionary to map product names to their text items
     textItemMapping = {}
@@ -126,8 +142,8 @@ def createConnection(scene, ingredient, ingredientColour, product, productColour
     connection.setPen(pen)
 
     connection.setVisible(False)  # Set the initial visibility to False
-    connection.src_item = ingredient  # Store the source item in the connection object
-    connection.dest_item = product  # Store the destination item in the connection object
+    connection.srcItem = ingredient  # Store the source item in the connection object
+    connection.destItem = product  # Store the destination item in the connection object
 
     ingredient.connections.append(connection)
     product.connections.append(connection)
