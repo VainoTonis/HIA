@@ -7,7 +7,7 @@ You should have received a copy of the GNU General Public License along with thi
 """
 from PyQt6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
 from sqlitestuff import getPIData
-from uiElements import createPlanetTextItems,createResourceTextItems, initializeConnections
+from uiElements import createPlanetTextItems,createResourceTextItems, createAllConnectionRelationships
 
 def main():
         
@@ -29,7 +29,7 @@ def main():
     # Consider maybe creating a seperate sqlite file
     # that contains information about the planet relationships 
     # so this does not need to be calculated on each run 
-    initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems)
+    createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems)
 
     # Create a QGraphicsView and set the scene
     view = QGraphicsView(scene)

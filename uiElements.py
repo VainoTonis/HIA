@@ -19,7 +19,6 @@ productLevels = {
         3 : "P3",
         4 : "P4"
     }
-
 resourceColourMapping = {
     "Planets" : "White",
     "P0" : "Yellow",
@@ -28,6 +27,7 @@ resourceColourMapping = {
     "P3" : "Blue",
     "P4" : "Pink"
 }
+
 #This handles logic for hovering, both colour changes and connection creation init
 class hoverableTextItem(QGraphicsTextItem):
     def __init__(self, text):
@@ -57,8 +57,8 @@ class hoverableTextItem(QGraphicsTextItem):
             connectedItem = connection.destItem if connection.srcItem == self else connection.srcItem
             if connectedItem.resourceLevel == self.resourceLevel:
                 break
-            recursiveConnectionRelationships(anchoredPlainText, False, showRelationships, connectedItem)
-            recursiveConnectionRelationships(anchoredPlainText, True, showRelationships, connectedItem)
+            showRelevantConnections(anchoredPlainText, False, showRelationships, connectedItem)
+            showRelevantConnections(anchoredPlainText, True, showRelationships, connectedItem)
             
 
 # Created a custom class to hold the resource name and its colour mapping
@@ -73,7 +73,7 @@ class resourceTextItem(hoverableTextItem):
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
-def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelationships, connectedItem):
+def showRelevantConnections(anchoredPlainText, flipSearch,  showRelationships, connectedItem):
         for connection in connectedItem.connections:
             if flipSearch:
                 itemSearchDirection = connection.srcItem
@@ -96,9 +96,9 @@ def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelatio
                 connection.srcItem.setDefaultTextColor(QColor(defaultColour))
                 connection.destItem.setDefaultTextColor(QColor(defaultColour))
 
-            recursiveConnectionRelationships(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
+            showRelevantConnections(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
 
-def initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
+def createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
     currentProductLevel = -1
     
     # Create a dictionary to map product names to their text items
@@ -110,9 +110,7 @@ def initializeConnections(scene, piData, planetTextItems , p0TextItems, p1TextIt
     for products in [p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems]:
         currentProductLevel += 1
         for product in products:
-            productName = product.toPlainText()
             inputResources = piData[productLevels[currentProductLevel]][product.toPlainText()]
-            potentialInputs = piData[productLevels[currentProductLevel - 1]]
             
             # Get the corresponding text items for each input
             inputTextItems = [textItemMapping[inputName] for inputName in inputResources if inputName in textItemMapping]
