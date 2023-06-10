@@ -73,6 +73,7 @@ class resourceTextItem(hoverableTextItem):
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
+# This is created to only show and highlight the connections that are either directly related or via children/parents
 def showRelevantConnections(anchoredPlainText, flipSearch,  showRelationships, connectedItem):
         for connection in connectedItem.connections:
             if flipSearch:
@@ -98,6 +99,7 @@ def showRelevantConnections(anchoredPlainText, flipSearch,  showRelationships, c
 
             showRelevantConnections(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
 
+# Logic behind between what resources are connected and call out the actual connection creation for each valid connection
 def createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):
     currentProductLevel = -1
     
@@ -120,7 +122,6 @@ def createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItem
                 createConnection(scene, inputTextItem, inputTextItem.resourceColour, product, product.resourceColour)
                 pass
 
-    
 # Creates the line between ingridient and product, with a nice gradient of colour changing into the next Tier
 def createConnection(scene, ingredient, ingredientColour, product, productColour):
     connection = QGraphicsLineItem(
