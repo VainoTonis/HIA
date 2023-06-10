@@ -43,7 +43,7 @@ class hoverableTextItem(QGraphicsTextItem):
         else:
             # This should NEVER happen as resourceTextItem requires the resourceTier to be set
             # Also if the value is not one of 5 in the mapping it should never get here either
-            SystemError("no resource colour found (AKA something very bad happened)")
+            raise SystemError("no resource colour found (AKA something very bad happened)")
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
@@ -57,9 +57,11 @@ class hoverableTextItem(QGraphicsTextItem):
             connectedItem = connection.destItem if connection.srcItem == self else connection.srcItem
             if connectedItem.resourceLevel == self.resourceLevel:
                 break
-            showRelevantConnections(anchoredPlainText, False, showRelationships, connectedItem)
-            showRelevantConnections(anchoredPlainText, True, showRelationships, connectedItem)
-            
+            if self.resourceLevel == "Planets":
+                singlePlanetVisualizationStart(self,showRelationships)
+                return
+            showRelevantConnections(anchoredPlainText, connectedItem, False, showRelationships)
+            showRelevantConnections(anchoredPlainText, connectedItem, True, showRelationships)         
 
 # Created a custom class to hold the resource name and its colour mapping
 # Might add connections aswell, not sure
@@ -72,32 +74,66 @@ class resourceTextItem(hoverableTextItem):
             self.resourceLevel = resourceLevel
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
+# This takes source and target information and makes the previously generated connection visible along with changing the colour of both source and target        
+def makeConnectionVisible(connection, showRelationships):
+    if showRelationships == True:
+        connection.setVisible(True)
+        connection.srcItem.setDefaultTextColor(QColor(connection.srcItem.resourceColour))
+        connection.destItem.setDefaultTextColor(QColor(connection.destItem.resourceColour))
+    else:
+        connection.setVisible(False)
+        connection.srcItem.setDefaultTextColor(QColor(defaultColour))
+        connection.destItem.setDefaultTextColor(QColor(defaultColour))
+
+# To avoid repetition when calculating the relationship tree for single planet origins
+def singlePlanetVisibilityCalculation(inputResources, showRelationships):
+    outputResources = []
+    inputResources = set(inputResources)
+
+    for inputResource in inputResources:
+        for inputResourceOutputConnections in inputResource.connections[1:]:
+            outputResourceInputs = set()
+            for stuff in inputResourceOutputConnections.destItem.connections:
+                if stuff.destItem == inputResourceOutputConnections.destItem:
+                    outputResourceInputs.add(stuff.srcItem)
+            if outputResourceInputs.issubset(inputResources):
+                makeConnectionVisible(inputResourceOutputConnections, showRelationships)
+                outputResources.append(inputResourceOutputConnections.destItem)
+
+    return outputResources
+
+# When you hover over a planet it calls this to only show what you can make with the resources from one planet
+def singlePlanetVisualizationStart(planet, showRelationships):
+    p0Items = []
+    for connection in planet.connections:
+        if connection.srcItem.toPlainText() != planet.toPlainText():
+            continue
+        p0Items.append(connection.destItem)
+
+        makeConnectionVisible(connection, showRelationships)
+
+    p1Items = singlePlanetVisibilityCalculation(p0Items, showRelationships)
+    p2Items = singlePlanetVisibilityCalculation(p1Items, showRelationships)
+    singlePlanetVisibilityCalculation(p2Items, showRelationships)
 
 # This is created to only show and highlight the connections that are either directly related or via children/parents
-def showRelevantConnections(anchoredPlainText, flipSearch,  showRelationships, connectedItem):
-        for connection in connectedItem.connections:
-            if flipSearch:
-                itemSearchDirection = connection.srcItem
-                itemSearchDirection2 = connection.destItem
-            else:
-                itemSearchDirection = connection.destItem
-                itemSearchDirection2 = connection.srcItem
+def showRelevantConnections(anchoredPlainText, connectedItem, flipSearch, showRelationships):
+    for connection in connectedItem.connections:
+        if flipSearch:
+            itemSearchDirection = connection.srcItem
+            itemSearchDirection2 = connection.destItem
+        else:
+            itemSearchDirection = connection.destItem
+            itemSearchDirection2 = connection.srcItem
 
-            if itemSearchDirection2.toPlainText() != anchoredPlainText:
-                continue
+        if itemSearchDirection2.toPlainText() != anchoredPlainText:
+            continue
 
-            recurseivlyAnchoredPlainText = itemSearchDirection.toPlainText()
-            recurseivlyConnectedItem = itemSearchDirection
-            if showRelationships == True:
-                connection.setVisible(True)
-                connection.srcItem.setDefaultTextColor(QColor(connection.srcItem.resourceColour))
-                connection.destItem.setDefaultTextColor(QColor(connection.destItem.resourceColour))
-            else:
-                connection.setVisible(False)
-                connection.srcItem.setDefaultTextColor(QColor(defaultColour))
-                connection.destItem.setDefaultTextColor(QColor(defaultColour))
+        recurseivlyAnchoredPlainText = itemSearchDirection.toPlainText()
+        recurseivlyConnectedItem = itemSearchDirection
 
-            showRelevantConnections(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
+        makeConnectionVisible(connection, showRelationships)
+        showRelevantConnections(recurseivlyAnchoredPlainText, recurseivlyConnectedItem, flipSearch, showRelationships)
 
 # Logic behind between what resources are connected and call out the actual connection creation for each valid connection
 def createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems):

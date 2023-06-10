@@ -136,6 +136,7 @@ def getPIData(eveSDE):
 
 # Debuggening
 def main():
+    getPIData("sqlite-latest.sqlite")
     print("Wrong file m8")
 
 if __name__ == "__main__":
