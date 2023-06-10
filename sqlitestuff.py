@@ -9,8 +9,8 @@ You should have received a copy of the GNU General Public License along with EIA
 """
 from sqlite3 import connect
 
-def connectToSDE():
-    conn = connect('sqlite/sqlite-latest.sqlite')
+def connectToSqliteDB(sqliteFile):
+    conn = connect('sqlite/' + sqliteFile)
     cursor = conn.cursor()
     return conn, cursor
 
@@ -77,8 +77,8 @@ def writePISchemaComponents(piData,cursor,outputLevel):
         
     return piData
 
-def getPIData():
-    conn, cursor = connectToSDE()
+def getPIData(eveSDE):
+    conn, cursor = connectToSqliteDB(eveSDE)
 
     # Get the node extractors for each planet
     # This is the only way I could get from the SDE the types of raw resources that exist in each planet

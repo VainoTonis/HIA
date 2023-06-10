@@ -9,6 +9,9 @@ from PyQt6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
 from sqlitestuff import getPIData
 from uiElements import createPlanetTextItems,createResourceTextItems, createAllConnectionRelationships
 
+eveSDE = "sqlite-latest.sqlite"
+
+
 def main():
         
     app = QApplication([])
@@ -16,7 +19,7 @@ def main():
     # Create a QGraphicsScene and set the scene rect
     scene = QGraphicsScene(0, 0, 1100, 600)
     # Extract unique planet names and resource names
-    piData = getPIData()
+    piData = getPIData(eveSDE)
 
     # Text item creation for flowchart
     planetTextItems = createPlanetTextItems(scene, piData, "Planets", 25)
