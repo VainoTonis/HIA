@@ -89,10 +89,12 @@ def recursiveConnectionRelationships(anchoredPlainText, flipSearch,  showRelatio
             recurseivlyConnectedItem = itemSearchDirection
             if showRelationships == True:
                 connection.setVisible(True)
-                connectedItem.setDefaultTextColor(QColor(connectedItem.resourceColour))
+                connection.srcItem.setDefaultTextColor(QColor(connection.srcItem.resourceColour))
+                connection.destItem.setDefaultTextColor(QColor(connection.destItem.resourceColour))
             else:
                 connection.setVisible(False)
-                connectedItem.setDefaultTextColor(QColor(defaultColour))
+                connection.srcItem.setDefaultTextColor(QColor(defaultColour))
+                connection.destItem.setDefaultTextColor(QColor(defaultColour))
 
             recursiveConnectionRelationships(recurseivlyAnchoredPlainText, flipSearch, showRelationships, recurseivlyConnectedItem)
 
