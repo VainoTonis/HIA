@@ -7,7 +7,7 @@ You should have received a copy of the GNU General Public License along with thi
 """
 from PyQt6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView
 from sqlitestuff import getPIData
-from uiElements import createPlanetTextItems,createResourceTextItems, createAllConnectionRelationships
+from uiElements import initializeResourceTree
 
 eveSDE = "sqlite-latest.sqlite"
 
@@ -18,26 +18,16 @@ def main():
 
     # Create a QGraphicsScene and set the scene rect
     scene = QGraphicsScene(0, 0, 1100, 600)
-    # Extract unique planet names and resource names
-    piData = getPIData(eveSDE)
-
-    # Text item creation for flowchart
-    planetTextItems = createPlanetTextItems(scene, piData, "Planets", 25)
-    p0TextItems = createResourceTextItems(scene, piData, "P0", 125)
-    p1TextItems = createResourceTextItems(scene, piData, "P1", 275)
-    p2TextItems = createResourceTextItems(scene, piData, "P2", 450)
-    p3TextItems = createResourceTextItems(scene, piData, "P3", 650)
-    p4TextItems = createResourceTextItems(scene, piData, "P4", 850)
-
-    # Consider maybe creating a seperate sqlite file
-    # that contains information about the planet relationships 
-    # so this does not need to be calculated on each run 
-    createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems)
-
     # Create a QGraphicsView and set the scene
     view = QGraphicsView(scene)
     view.show()
 
+    # Extract unique planet names and resource names
+    piData = getPIData(eveSDE)
+
+    # Start planet - P4 tree viewer
+    initializeResourceTree(scene,piData)
+   
     app.exec()
 
 

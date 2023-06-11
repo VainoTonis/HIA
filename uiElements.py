@@ -74,6 +74,22 @@ class resourceTextItem(hoverableTextItem):
             self.resourceLevel = resourceLevel
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
+
+# Start the scene for the resource overview tree
+def initializeResourceTree(scene, piData):
+    # Text item creation for flowchart
+    planetTextItems = createPlanetTextItems(scene, piData, "Planets", 25)
+    p0TextItems = createResourceTextItems(scene, piData, "P0", 125)
+    p1TextItems = createResourceTextItems(scene, piData, "P1", 275)
+    p2TextItems = createResourceTextItems(scene, piData, "P2", 450)
+    p3TextItems = createResourceTextItems(scene, piData, "P3", 650)
+    p4TextItems = createResourceTextItems(scene, piData, "P4", 850)
+
+    # Consider maybe creating a seperate sqlite file
+    # that contains information about the planet relationships 
+    # so this does not need to be calculated on each run 
+    createAllConnectionRelationships(scene, piData, planetTextItems , p0TextItems, p1TextItems, p2TextItems, p3TextItems, p4TextItems)
+
 # This takes source and target information and makes the previously generated connection visible along with changing the colour of both source and target        
 def makeConnectionVisible(connection, showRelationships):
     if showRelationships == True:
