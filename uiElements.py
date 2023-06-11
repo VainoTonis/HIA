@@ -87,29 +87,23 @@ def makeConnectionVisible(connection, showRelationships):
 
 # To avoid repetition when calculating the relationship tree for single planet origins
 def singlePlanetVisibilityCalculation(inputResources, showRelationships):
-    outputResources = []
-    inputResources = set(inputResources)
-
+    outputResources = set()
     for inputResource in inputResources:
         for inputResourceOutputConnections in inputResource.connections[1:]:
-            outputResourceInputs = set()
-            for stuff in inputResourceOutputConnections.destItem.connections:
-                if stuff.destItem == inputResourceOutputConnections.destItem:
-                    outputResourceInputs.add(stuff.srcItem)
+            outputResourceInputs = {stuff.srcItem for stuff in inputResourceOutputConnections.destItem.connections if stuff.destItem == inputResourceOutputConnections.destItem}
             if outputResourceInputs.issubset(inputResources):
                 makeConnectionVisible(inputResourceOutputConnections, showRelationships)
-                outputResources.append(inputResourceOutputConnections.destItem)
+                outputResources.add(inputResourceOutputConnections.destItem)
 
     return outputResources
 
 # When you hover over a planet it calls this to only show what you can make with the resources from one planet
 def singlePlanetVisualizationStart(planet, showRelationships):
-    p0Items = []
+    p0Items = set()
     for connection in planet.connections:
         if connection.srcItem.toPlainText() != planet.toPlainText():
             continue
-        p0Items.append(connection.destItem)
-
+        p0Items.add(connection.destItem)
         makeConnectionVisible(connection, showRelationships)
 
     p1Items = singlePlanetVisibilityCalculation(p0Items, showRelationships)
