@@ -1,15 +1,8 @@
 # Folders
 __pycache__/
-tmp/
 .vscode/
-migrations/
+tmp/*
 logs/*
-generatedStatic/
-
-# SQLite DB files
-sqlite/*
 
 # Configuration files
-config.yaml
-*.env
 poetry.lock
