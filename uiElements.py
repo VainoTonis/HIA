@@ -7,8 +7,9 @@ EIA is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 
 You should have received a copy of the GNU General Public License along with EIA. If not, see <https://www.gnu.org/licenses/>. 
 """
-from PyQt6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem
-from PyQt6.QtGui import QPen, QColor, QLinearGradient,QBrush
+from PyQt6.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QVBoxLayout, QHBoxLayout, QPushButton, QWidget
+from PyQt6.QtGui import QPen, QColor, QLinearGradient, QBrush, QIcon, QPalette
+from PyQt6.QtCore import Qt
 
 defaultColour = "gray"
 productLevels = {
@@ -74,6 +75,50 @@ class resourceTextItem(hoverableTextItem):
             self.resourceLevel = resourceLevel
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
+
+class CollapsibleSidebar(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        collapseIcon = "static/chevron-right.svg"
+        planetRelationshipViewerIcon = "static/globe-europe-africa.svg"
+        settingsIcon = "static/tools.svg"
+
+        self.collapse = self.createButton(collapseIcon, True)
+        self.planetRelationshipViewer = self.createButton(planetRelationshipViewerIcon)
+        self.settings = self.createButton(settingsIcon)
+
+        # Set up the layout for the buttons
+        layout.addWidget(self.collapse)
+        layout.addWidget(self.planetRelationshipViewer)
+        layout.addWidget(self.settings)
+        layout.addStretch(1)  # Add stretch to push widgets to the top
+
+        self.setLayout(layout)
+        self.collapsed = True
+
+        # Set the minimum size of the sidebar
+
+    def toggleSidebar(self):
+        self.collapsed = not self.collapsed
+        if self.collapsed:
+            self.collapse.setIcon(QIcon("static/chevron-right.svg"))
+        else:
+            self.collapse.setIcon(QIcon("static/chevron-left.svg"))
+
+    def createButton(self, icon, isCollapseButton=False):
+        button = QPushButton()
+        button.setIcon(QIcon(icon))
+        button.setContentsMargins(0,0,0,0)
+        button.setMinimumSize(60, 80)
+        button.setMaximumSize(60, 80)
+        if isCollapseButton:
+            button.clicked.connect(self.toggleSidebar)
+        return button
 
 # Start the scene for the resource overview tree
 def initializeResourceTree(scene, piData):
