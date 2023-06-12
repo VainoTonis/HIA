@@ -7,12 +7,13 @@ You should have received a copy of the GNU General Public License along with thi
 """
 from PyQt6.QtWidgets import QMainWindow, QApplication, QGraphicsScene, QGraphicsView, QHBoxLayout, QWidget
 from sqlitestuff import getPIData
-from uiElements import initializeResourceTree, CollapsibleSidebar
+from uiElements import initializeResourceTree, navigationSideBar
 
 eveSDE = "sqlite-latest.sqlite"
 applicationCSS = "static/app.css"
 title = "Eve Industry Assistant"
 version = "0.0.1"
+
 
 
 def main():
@@ -21,31 +22,39 @@ def main():
     with open(applicationCSS, "r") as styleSheet:
         app.setStyleSheet(styleSheet.read())
 
-    main_window = QMainWindow()
-    main_window.setWindowTitle(title + " " + version)
-    sidebar = CollapsibleSidebar()
+    mainWindow = QMainWindow()
+    mainWindow.setWindowTitle(title + " " + version)
+
 
     # Create a QGraphicsScene and set the scene rect
-    scene = QGraphicsScene(0, 0, 1100, 600)
+    planetRelationshipViewerScene = QGraphicsScene(0, 0, 1100, 600)
+    scene2 = QGraphicsScene(0, 0, 1100, 600)
+
+    sidebar = navigationSideBar(planetRelationshipViewerScene, settingsScene=scene2)
+
     # Create a QGraphicsView and set the scene
-    view = QGraphicsView(scene)
-    main_layout = QHBoxLayout()
-    main_layout.setContentsMargins(0, 0, 0, 0)
-    main_layout.setSpacing(0)
-    main_layout.addWidget(sidebar)
-    main_layout.addWidget(view)
+    view = QGraphicsView(planetRelationshipViewerScene)
+    sidebar.setView(view)
 
-    central_widget = QWidget()
-    central_widget.setLayout(main_layout)
-    main_window.setCentralWidget(central_widget)
 
-    main_window.show()
+    mainLayout = QHBoxLayout()
+    mainLayout.setContentsMargins(0, 0, 0, 0)
+    mainLayout.setSpacing(0)
+    mainLayout.addWidget(sidebar)
+    mainLayout.addWidget(view)
+
+# Combine the final layout into a central widget that is used in the main window to make everything sticky
+    centralWidget = QWidget()
+    centralWidget.setLayout(mainLayout)
+    mainWindow.setCentralWidget(centralWidget)
+
+    mainWindow.show()
 
     # Extract unique planet names and resource names
     piData = getPIData(eveSDE)
 
     # Start planet - P4 tree viewer
-    initializeResourceTree(scene, piData)
+    initializeResourceTree(planetRelationshipViewerScene, piData)
 
     view.show()
     app.exec()

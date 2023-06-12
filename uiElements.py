@@ -76,21 +76,22 @@ class resourceTextItem(hoverableTextItem):
         else:
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
-class CollapsibleSidebar(QWidget):
-    def __init__(self):
+class navigationSideBar(QWidget):
+    def __init__(self, planetRelationshipViewerScene=None, settingsScene=None):
         super().__init__()
 
         layout = QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
 
+
         collapseIcon = "static/chevron-right.svg"
         planetRelationshipViewerIcon = "static/globe-europe-africa.svg"
         settingsIcon = "static/tools.svg"
 
-        self.collapse = self.createButton(collapseIcon, True)
-        self.planetRelationshipViewer = self.createButton(planetRelationshipViewerIcon)
-        self.settings = self.createButton(settingsIcon)
+        self.collapse = self.createButton(icon=collapseIcon, isCollapseButton=True)
+        self.planetRelationshipViewer = self.createButton(icon=planetRelationshipViewerIcon, scene=planetRelationshipViewerScene)
+        self.settings = self.createButton(icon=settingsIcon, scene=settingsScene)
 
         # Set up the layout for the buttons
         layout.addWidget(self.collapse)
@@ -101,7 +102,13 @@ class CollapsibleSidebar(QWidget):
         self.setLayout(layout)
         self.collapsed = True
 
+
         # Set the minimum size of the sidebar
+    def setView(self, view):
+        self.view = view
+
+    def setScene(self, scene):
+        self.view.setScene(scene)
 
     def toggleSidebar(self):
         self.collapsed = not self.collapsed
@@ -110,7 +117,7 @@ class CollapsibleSidebar(QWidget):
         else:
             self.collapse.setIcon(QIcon("static/chevron-left.svg"))
 
-    def createButton(self, icon, isCollapseButton=False):
+    def createButton(self, icon=None, scene=None, isCollapseButton=False):
         button = QPushButton()
         button.setIcon(QIcon(icon))
         button.setContentsMargins(0,0,0,0)
@@ -118,6 +125,8 @@ class CollapsibleSidebar(QWidget):
         button.setMaximumSize(60, 80)
         if isCollapseButton:
             button.clicked.connect(self.toggleSidebar)
+        elif scene is not None:
+            button.clicked.connect(lambda: self.setScene(scene))
         return button
 
 # Start the scene for the resource overview tree
