@@ -77,7 +77,7 @@ class resourceTextItem(hoverableTextItem):
             raise SystemError("FALSE INPUT was given", resourceLevel)
 
 class navigationSideBar(QWidget):
-    def __init__(self, planetRelationshipViewerScene=None, settingsScene=None):
+    def __init__(self, planetRelationshipViewerScene=None, settingsScene=None, dashboardScene=None):
         super().__init__()
 
         layout = QVBoxLayout()
@@ -87,17 +87,20 @@ class navigationSideBar(QWidget):
 
         collapseIcon = "static/chevron-right.svg"
         planetRelationshipViewerIcon = "static/globe-europe-africa.svg"
+        dashboardIcon = "static/heart-pulse.svg"
         settingsIcon = "static/tools.svg"
 
-        self.collapse = self.createButton(icon=collapseIcon, isCollapseButton=True)
+        # self.collapse = self.createButton(icon=collapseIcon, isCollapseButton=True)
         self.planetRelationshipViewer = self.createButton(icon=planetRelationshipViewerIcon, scene=planetRelationshipViewerScene)
         self.settings = self.createButton(icon=settingsIcon, scene=settingsScene)
+        self.dashboard = self.createButton(icon=dashboardIcon, scene=dashboardScene)
 
         # Set up the layout for the buttons
-        layout.addWidget(self.collapse)
+        # layout.addWidget(self.collapse)
         layout.addWidget(self.planetRelationshipViewer)
+        layout.addWidget(self.dashboard)
+        layout.addStretch()  # Add stretch to push widgets to the top
         layout.addWidget(self.settings)
-        layout.addStretch(1)  # Add stretch to push widgets to the top
 
         self.setLayout(layout)
         self.collapsed = True
@@ -121,8 +124,8 @@ class navigationSideBar(QWidget):
         button = QPushButton()
         button.setIcon(QIcon(icon))
         button.setContentsMargins(0,0,0,0)
-        button.setMinimumSize(60, 80)
-        button.setMaximumSize(60, 80)
+        button.setMinimumSize(60, 70)
+        button.setMaximumSize(60, 70)
         if isCollapseButton:
             button.clicked.connect(self.toggleSidebar)
         elif scene is not None:

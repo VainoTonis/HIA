@@ -28,20 +28,21 @@ def main():
 
     # Create a QGraphicsScene and set the scene rect
     planetRelationshipViewerScene = QGraphicsScene(0, 0, 1100, 600)
-    scene2 = QGraphicsScene(0, 0, 1100, 600)
+    settingsScene = QGraphicsScene(0, 0, 1100, 600)
+    dashboardScene = QGraphicsScene(0, 0, 1100, 600)
 
-    sidebar = navigationSideBar(planetRelationshipViewerScene, settingsScene=scene2)
+    sidebar = navigationSideBar(planetRelationshipViewerScene, settingsScene, dashboardScene)
 
     # Create a QGraphicsView and set the scene
-    view = QGraphicsView(planetRelationshipViewerScene)
-    sidebar.setView(view)
+    planetRelationshipView = QGraphicsView(planetRelationshipViewerScene)
+    sidebar.setView(planetRelationshipView)
 
 
     mainLayout = QHBoxLayout()
     mainLayout.setContentsMargins(0, 0, 0, 0)
     mainLayout.setSpacing(0)
     mainLayout.addWidget(sidebar)
-    mainLayout.addWidget(view)
+    mainLayout.addWidget(planetRelationshipView)
 
 # Combine the final layout into a central widget that is used in the main window to make everything sticky
     centralWidget = QWidget()
@@ -56,7 +57,7 @@ def main():
     # Start planet - P4 tree viewer
     initializeResourceTree(planetRelationshipViewerScene, piData)
 
-    view.show()
+    planetRelationshipView.show() 
     app.exec()
 
 
